@@ -31,8 +31,8 @@ z_coord = int(input('+ Enter Z coordinate ?:  '))
 vline_x = int(input('+ Selected horizontal line of 1st view ?:  '))
 vline_y = int(input('+ Selected horizontal line of 2nd view ?:  '))
 vline_z = int(input('+ Selected horizontal line of 3rd view ?:  '))
-cb_min = int(input('++ Minimum of a output scale ?:  '))
-cb_max = int(input('++ Maximum of a output scale ?:  '))
+cb_min = int(input('++ Minimum of an output scale ?:  '))
+cb_max = int(input('++ Maximum of an output scale ?:  '))
 
 ## Main Run ##
 # load mri image
