@@ -21,7 +21,7 @@
 python ipPlot.py
 ```
 + <b> Just type _input arguments_</b>
-![](assets/README-87a00668.png)
+![](assets/README-30b8514f.png)
 
 + You can decide above arguments as the following example
 ![](assets/README-7e6a63c0.png)
