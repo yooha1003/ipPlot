@@ -113,6 +113,6 @@ fig.subplots_adjust(right=0.8)
 cbar_ax = fig.add_axes([0.83, 0.13, 0.03, 0.72])
 cbar = fig.colorbar(im1, cax=cbar_ax)
 # cbar = fig.colorbar(im1, cax=cbar_ax, ticks=[0,0.5,1,1.5,2.0])
-cbar.set_label('Ratio', labelpad=25, rotation=270, size=20)
+cbar.set_label('A Range of Intensity Values', labelpad=25, rotation=270, size=15)
 # save figure
 plt.savefig('ipPlot_figure.png', dpi = 300)
