@@ -24,7 +24,7 @@ python ipPlot.py
 ![](assets/README-30b8514f.png)
 
 + You can decide above arguments as the following example
-![](assets/README-7e6a63c0.png)
+![](assets/README-a8dc16f8.png)
 
 + <b>Tips</b>
 ```
@@ -40,8 +40,7 @@ python ipPlot.py --help
 
 ## Outputs
 + Intensity Profile Figure
-![](assets/README-37ad1c10.png)
-
+![](assets/README-b28a5770.png)
 
 ## Version history
 + Version 0.10 : The script release (2020.08.04)
