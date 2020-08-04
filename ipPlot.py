@@ -6,10 +6,8 @@ import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
 import numpy as np
 import pandas as pd
-import seaborn as sns
 import nibabel as nib
 import argparse
-sns.set()
 import scipy.interpolate as interpolate
 from nilearn.image import resample_img
 
