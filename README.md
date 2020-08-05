@@ -40,7 +40,7 @@ python ipPlot.py --help
 
 ## Outputs
 + Intensity Profile Figure
-![](assets/README-dce224d9.png)
+![](assets/README-4377ffa6.png)
 
 ## Version history
 + Version 0.10 : The script release (2020.08.04)
