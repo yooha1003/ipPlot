@@ -99,7 +99,7 @@ plt.yticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_di
 
 ax4.plot(img1_up_array_x,color='#f9fc2b')
 plt.sca(ax4)
-plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/4),round(y_dim/2)], color="black")
+plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
 ax4.set_facecolor('gray')
 ax4.grid(False)
 ax5.plot(img1_up_array_y,color='#f9fc2b')
