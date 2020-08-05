@@ -25,16 +25,7 @@ parser.parse_args()
 
 # assign input arguments
 img_input = str(input('++ Enter Nifti file name:  '))
-x_coord = int(input('+ Enter X coordinate ?:  '))
-y_coord = int(input('+ Enter Y coordinate ?:  '))
-z_coord = int(input('+ Enter Z coordinate ?:  '))
-vline_x = int(input('+ Selected horizontal line of 1st view ?:  '))
-vline_y = int(input('+ Selected horizontal line of 2nd view ?:  '))
-vline_z = int(input('+ Selected horizontal line of 3rd view ?:  '))
-cb_min = int(input('++ Minimum of an output scale ?:  '))
-cb_max = int(input('++ Maximum of an output scale ?:  '))
-
-## Main Run ##
+# extract header information of input
 # load mri image
 img1 = nib.load(img_input)
 # header information extraction
@@ -43,7 +34,36 @@ x_pixdim,y_pixdim,z_pixdim = hdr.get_zooms()
 min_pixdim = min(hdr.get_zooms())
 max_pixdim = max(hdr.get_zooms())
 ratio_pixdim = int(max_pixdim / min_pixdim)
-vline_y = vline_y * ratio_pixdim
+ratio_pixdim_x_width = int(max_pixdim / x_pixdim)
+ratio_pixdim_y_width = int(max_pixdim / y_pixdim)
+ratio_pixdim_z_width = int(max_pixdim / z_pixdim)
+ratio_pixdim_x_vline = int(x_pixdim / min_pixdim)
+ratio_pixdim_y_vline = int(y_pixdim / min_pixdim)
+ratio_pixdim_z_vline = int(z_pixdim / min_pixdim)
+
+# dimension
+img1_array = np.asarray(img1.dataobj)
+max_val = np.ndarray.max(img1_array)
+# x,y,z ranges
+x_dim_original = img1_array.shape[0]
+y_dim_original = img1_array.shape[1]
+z_dim_original = img1_array.shape[2]
+
+# other arguments
+x_coord = int(input('+ Enter X coordinate (' + str(0) + '-' + str(x_dim_original) + '):  '))
+y_coord = int(input('+ Enter Y coordinate (' + str(0) + '-' + str(y_dim_original) + '):  '))
+z_coord = int(input('+ Enter Z coordinate (' + str(0) + '-' + str(z_dim_original) + '):  '))
+vline1 = int(input('+ Selected horizontal line of 1st view (' + str(0) + '-' + str(z_dim_original) + '):  '))
+vline2 = int(input('+ Selected horizontal line of 2nd view (' + str(0) + '-' + str(z_dim_original) + '):  '))
+vline3 = int(input('+ Selected horizontal line of 3rd view (' + str(0) + '-' + str(y_dim_original) + '):  '))
+cb_min = float(input('++ Minimum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
+cb_max = float(input('++ Maximum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
+
+## Main Run ##
+vline1 = vline1 * ratio_pixdim_z_vline
+vline2 = vline2 * ratio_pixdim_z_vline
+vline3 = vline3 * ratio_pixdim_y_vline
+
 # upscaling based on minimum pixel resolution
 img1_up = resample_img(img1, target_affine=np.eye(3)*min_pixdim, interpolation='nearest')
 img1_up_array = np.asarray(img1_up.dataobj)
@@ -51,66 +71,89 @@ img1_up_array = np.asarray(img1_up.dataobj)
 x_dim = img1_up_array.shape[0]
 y_dim = img1_up_array.shape[1]
 z_dim = img1_up_array.shape[2]
-# # data extraction
-img1_up_array_x = img1_up_array[x_coord,:,vline_x]
-img1_up_array_y = img1_up_array[:,y_coord,vline_y]
-img1_up_array_z = img1_up_array[:,vline_z,z_coord]
+
+# data extraction for line plots
+img1_up_array_x = img1_up_array[:,y_coord,vline1]
+img1_up_array_y = img1_up_array[x_coord,:,vline2]
+img1_up_array_z = img1_up_array[:,vline3,z_coord]
 
 # subplot
 fig = plt.figure(figsize=(12, 6))
 
+# width _ratio for plotting
+# w_ratio = [2,2,2]
 if ratio_pixdim == 1:
     w_ratio = [2,2,2]
+elif ratio_pixdim == 2:
+    w_ratio = [ratio_pixdim_x_width,ratio_pixdim_y_width,ratio_pixdim_z_width]
+    # w_ratio = [2,2,2]
 else:
-    w_ratio = [1,2,2]
+    w_ratio = [2,2,2]
 
+#
+# grid spec
 gs = gridspec.GridSpec(2, 3,
                        width_ratios=w_ratio,
                        height_ratios=[2,1]
                        )
-gs.update(wspace=0.4, hspace=0.2)
+gs.update(wspace=0.4,hspace=0.2)
 
-ax1 = plt.subplot(gs[0])
-ax2 = plt.subplot(gs[1])
-ax3 = plt.subplot(gs[2])
-ax4 = plt.subplot(gs[3])
-ax5 = plt.subplot(gs[4])
-ax6 = plt.subplot(gs[5])
+ax1 = fig.add_subplot(gs[0])
+ax2 = fig.add_subplot(gs[1])
+ax3 = fig.add_subplot(gs[2])
+ax4 = fig.add_subplot(gs[3])
+ax5 = fig.add_subplot(gs[4])
+ax6 = fig.add_subplot(gs[5])
 
 # images
-im1 = ax1.imshow(img1_up_array[x_coord,:,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
-ax1.plot([0, y_dim], [vline_x, vline_x], color='#f9fc2b', linestyle='-')
+im1 = ax1.imshow(img1_up_array[:,y_coord,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
+ax1.plot([0, x_dim], [vline2, vline2], color='#f9fc2b', linestyle='-')
 ax1.set_facecolor('white')
 ax1.grid(False)
-im2 = ax2.imshow(img1_up_array[:,y_coord,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
-ax2.plot([0, x_dim], [vline_y, vline_y], color='#f9fc2b', linestyle='-')
+ax1.autoscale(False)
+
+im2 = ax2.imshow(img1_up_array[x_coord,:,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
+ax2.plot([0, y_dim], [vline1, vline1], color='#f9fc2b', linestyle='-')
 ax2.set_facecolor('white')
 ax2.grid(False)
+ax2.autoscale(False)
+plt.sca(ax2)
+plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+
 im3 = ax3.imshow(img1_up_array[:,:,z_coord].T,cmap='jet', origin='lower',vmin=cb_min, vmax=cb_max)
-ax3.plot([0, x_dim], [vline_z, vline_z], color='#f9fc2b', linestyle='-')
+ax3.plot([0, x_dim], [vline3, vline3], color='#f9fc2b', linestyle='-')
 ax3.set_facecolor('white')
 ax3.grid(False)
-plt.sca(ax1)
-plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+ax3.autoscale(False)
 plt.sca(ax3)
 plt.yticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
 
-# plots
-
+# subplots
 ax4.plot(img1_up_array_x,color='#f9fc2b')
 plt.sca(ax4)
-plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+# plt.minorticks_on()
+plt.margins(x=0)
 ax4.set_facecolor('gray')
 ax4.grid(False)
+
 ax5.plot(img1_up_array_y,color='#f9fc2b')
+plt.sca(ax5)
+# plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+# plt.minorticks_on()
+plt.margins(x=0)
 ax5.set_facecolor('gray')
 ax5.grid(False)
+
+
 ax6.plot(img1_up_array_z,color='#f9fc2b')
+plt.sca(ax6)
+# plt.minorticks_on()
+plt.margins(x=0)
 ax6.set_facecolor('gray')
 ax6.grid(False)
 
 fig.subplots_adjust(right=0.8)
-cbar_ax = fig.add_axes([0.83, 0.13, 0.03, 0.72])
+cbar_ax = fig.add_axes([0.83, 0.13, 0.03, 0.65])
 cbar = fig.colorbar(im1, cax=cbar_ax)
 # cbar = fig.colorbar(im1, cax=cbar_ax, ticks=[0,0.5,1,1.5,2.0])
 cbar.set_label('A Range of Intensity Values', labelpad=25, rotation=270, size=15)
