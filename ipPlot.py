@@ -15,7 +15,7 @@ from nilearn.image import resample_img
 parser = argparse.ArgumentParser(description='## Intensity profile of NifTI file plotting script ##', formatter_class=argparse.RawDescriptionHelpFormatter,
                                  epilog='''\
 version history:
-    [ver0.10]       release of this script (2020.08.04)
+    [ver0.10]       release of this script (2020.08.07)
 
 ++ Copyright at uschoi@nict.go.jp / qtwing@naver.com ++
 ''')
@@ -59,10 +59,6 @@ vline3 = int(input('+ Selected horizontal line of 3rd view (' + str(0) + '-' + s
 cb_min = float(input('++ Minimum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
 cb_max = float(input('++ Maximum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
 
-## Main Run ##
-vline1 = vline1 * ratio_pixdim_z_vline
-vline2 = vline2 * ratio_pixdim_z_vline
-vline3 = vline3 * ratio_pixdim_y_vline
 
 # upscaling based on minimum pixel resolution
 img1_up = resample_img(img1, target_affine=np.eye(3)*min_pixdim, interpolation='nearest')
@@ -71,24 +67,24 @@ img1_up_array = np.asarray(img1_up.dataobj)
 x_dim = img1_up_array.shape[0]
 y_dim = img1_up_array.shape[1]
 z_dim = img1_up_array.shape[2]
+max_dim = max(x_dim,y_dim,z_dim)
+min_dim = min(x_dim,y_dim,z_dim)
+
+## Main Run ##
+vline1_up = round(vline1 * (z_dim / z_dim_original))
+vline2_up = round(vline2 * (z_dim / z_dim_original))
+vline3_up = round(vline3 * (y_dim / y_dim_original))
 
 # data extraction for line plots
-img1_up_array_x = img1_up_array[:,y_coord,vline1]
-img1_up_array_y = img1_up_array[x_coord,:,vline2]
-img1_up_array_z = img1_up_array[:,vline3,z_coord]
+img1_up_array_x = img1_up_array[:,round(y_coord * (y_dim / y_dim_original)),vline1_up]
+img1_up_array_y = img1_up_array[round(x_coord * (x_dim / x_dim_original)),:,vline2_up]
+img1_up_array_z = img1_up_array[:,vline3_up,round(z_coord * (z_dim / z_dim_original))]
 
 # subplot
 fig = plt.figure(figsize=(12, 6))
 
-# width _ratio for plotting
-# w_ratio = [2,2,2]
-if ratio_pixdim == 1:
-    w_ratio = [2,2,2]
-elif ratio_pixdim == 2:
-    w_ratio = [ratio_pixdim_x_width,ratio_pixdim_y_width,ratio_pixdim_z_width]
-    # w_ratio = [2,2,2]
-else:
-    w_ratio = [2,2,2]
+# set th w_ratio
+w_ratio = [x_dim / min_dim,y_dim / min_dim,z_dim / min_dim]
 
 #
 # grid spec
@@ -106,31 +102,37 @@ ax5 = fig.add_subplot(gs[4])
 ax6 = fig.add_subplot(gs[5])
 
 # images
-im1 = ax1.imshow(img1_up_array[:,y_coord,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
-ax1.plot([0, x_dim], [vline2, vline2], color='#f9fc2b', linestyle='-')
+im1 = ax1.imshow(img1_up_array[:,round(y_coord * (y_dim / y_dim_original)),:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
+ax1.plot([0, x_dim], [vline1_up, vline1_up], color='#f9fc2b', linestyle='-')
 ax1.set_facecolor('white')
 ax1.grid(False)
 ax1.autoscale(False)
+plt.sca(ax1)
+plt.xticks([0,round(x_dim/2),x_dim], [0,round(x_dim_original/2),round(x_dim_original)], color="black")
+plt.yticks([0,round(z_dim/2),z_dim], [0,round(z_dim_original/2),round(z_dim_original)], color="black")
 
-im2 = ax2.imshow(img1_up_array[x_coord,:,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
-ax2.plot([0, y_dim], [vline1, vline1], color='#f9fc2b', linestyle='-')
+im2 = ax2.imshow(img1_up_array[round(x_coord * (x_dim / x_dim_original)),:,:].T,cmap='jet',origin='lower',vmin=cb_min, vmax=cb_max)
+ax2.plot([0, y_dim], [vline2_up, vline2_up], color='#f9fc2b', linestyle='-')
 ax2.set_facecolor('white')
 ax2.grid(False)
 ax2.autoscale(False)
 plt.sca(ax2)
-plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim_original/2),round(y_dim_original)], color="black")
+plt.yticks([0,round(z_dim/2),z_dim], [0,round(z_dim_original/2),round(z_dim_original)], color="black")
 
-im3 = ax3.imshow(img1_up_array[:,:,z_coord].T,cmap='jet', origin='lower',vmin=cb_min, vmax=cb_max)
-ax3.plot([0, x_dim], [vline3, vline3], color='#f9fc2b', linestyle='-')
+im3 = ax3.imshow(img1_up_array[:,:,round(z_coord * (z_dim / z_dim_original))].T,cmap='jet', origin='lower',vmin=cb_min, vmax=cb_max)
+ax3.plot([0, x_dim], [vline3_up, vline3_up], color='#f9fc2b', linestyle='-')
 ax3.set_facecolor('white')
 ax3.grid(False)
 ax3.autoscale(False)
 plt.sca(ax3)
-plt.yticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+plt.xticks([0,round(x_dim/2),x_dim], [0,round(x_dim_original/2),round(x_dim_original)], color="black")
+plt.yticks([0,round(y_dim/2),y_dim], [0,round(y_dim_original/2),round(y_dim_original)], color="black")
 
 # subplots
 ax4.plot(img1_up_array_x,color='#f9fc2b')
 plt.sca(ax4)
+plt.xticks([0,round(x_dim/2),x_dim], [0,round(x_dim_original/2),round(x_dim_original)], color="black")
 # plt.minorticks_on()
 plt.margins(x=0)
 ax4.set_facecolor('gray')
@@ -138,7 +140,7 @@ ax4.grid(False)
 
 ax5.plot(img1_up_array_y,color='#f9fc2b')
 plt.sca(ax5)
-# plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim/(2*ratio_pixdim)),round(y_dim/ratio_pixdim)], color="black")
+plt.xticks([0,round(y_dim/2),y_dim], [0,round(y_dim_original/2),round(y_dim_original)], color="black")
 # plt.minorticks_on()
 plt.margins(x=0)
 ax5.set_facecolor('gray')
@@ -147,6 +149,7 @@ ax5.grid(False)
 
 ax6.plot(img1_up_array_z,color='#f9fc2b')
 plt.sca(ax6)
+plt.xticks([0,round(x_dim/2),x_dim], [0,round(x_dim_original/2),round(x_dim_original)], color="black")
 # plt.minorticks_on()
 plt.margins(x=0)
 ax6.set_facecolor('gray')
