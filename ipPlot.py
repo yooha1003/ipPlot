@@ -84,7 +84,7 @@ img1_up_array_z = img1_up_array[:,vline3_up,round(z_coord * (z_dim / z_dim_origi
 fig = plt.figure(figsize=(12, 6))
 
 # set th w_ratio
-w_ratio = [x_dim / min_dim,y_dim / min_dim,z_dim / min_dim]
+w_ratio = [x_dim / min_dim,y_dim / min_dim,x_dim / min_dim]
 
 #
 # grid spec
