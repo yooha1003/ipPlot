@@ -5,6 +5,7 @@
 
 ## Description
 + Python3 based plotting script
++ Ver 0.11 supports 4D MR image
 + The script is very simple to use
 + Outputs are "_Intensity Profile Figure_" of MR images (Sagittal, Coronal, Axial views)
 
@@ -21,7 +22,7 @@
 python ipPlot.py
 ```
 + <b> Just type _input arguments_</b>
-![](assets/README-f0b076c6.png)
+![](assets/README-26458a65.png)
 
 + You can decide above arguments as the following example
 ![](assets/README-a8dc16f8.png)
@@ -39,10 +40,14 @@ python ipPlot.py --help
 ```
 
 ## Outputs
-+ Intensity Profile Figure
-![](assets/README-4377ffa6.png)
++ Intensity Profile (3D)
+![](assets/README-758894fc.png)
+
++ Intensity Profile (4D)
+![](assets/README-1a75415a.png)
 
 ## Version history
++ Version 0.11 : The script release (2020.08.07)
 + Version 0.10 : The script release (2020.08.04)
 
 ## _Contact for Feedback and Bug Reports_
