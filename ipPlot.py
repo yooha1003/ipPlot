@@ -15,7 +15,8 @@ from nilearn.image import resample_img
 parser = argparse.ArgumentParser(description='## Intensity profile of NifTI file plotting script ##', formatter_class=argparse.RawDescriptionHelpFormatter,
                                  epilog='''\
 version history:
-    [ver0.10]       release of this script (2020.08.07)
+    [Ver0.11]       supports 4D image (2020.08.07)
+    [ver0.10]       release of this script (2020.08.04)
 
 ++ Copyright at uschoi@nict.go.jp / qtwing@naver.com ++
 ''')
@@ -30,9 +31,19 @@ img_input = str(input('++ Enter Nifti file name:  '))
 img1 = nib.load(img_input)
 # header information extraction
 hdr = img1.header
-x_pixdim,y_pixdim,z_pixdim = hdr.get_zooms()
-min_pixdim = min(hdr.get_zooms())
-max_pixdim = max(hdr.get_zooms())
+dim_info = hdr['dim'] # 3D and 4D
+dim_check = dim_info[0]
+max_vol = dim_info[4]
+pix_info = hdr['pixdim']
+x_pixdim = pix_info[1]
+y_pixdim = pix_info[2]
+z_pixdim = pix_info[3]
+max_pixdim = max(x_pixdim,y_pixdim,z_pixdim)
+min_pixdim = min(x_pixdim,y_pixdim,z_pixdim)
+
+# x_pixdim,y_pixdim,z_pixdim = hdr.get_zooms()
+# min_pixdim = min(hdr.get_zooms())
+# max_pixdim = max(hdr.get_zooms())
 ratio_pixdim = int(max_pixdim / min_pixdim)
 ratio_pixdim_x_width = int(max_pixdim / x_pixdim)
 ratio_pixdim_y_width = int(max_pixdim / y_pixdim)
@@ -50,6 +61,10 @@ y_dim_original = img1_array.shape[1]
 z_dim_original = img1_array.shape[2]
 
 # other arguments
+if dim_check == 4:
+    vol = int(input('++ Selected volume (' + str(0) + '-' + str(max_vol) + '):  '))
+else:
+    print('You input 3D image !!')
 x_coord = int(input('+ Enter X coordinate (' + str(0) + '-' + str(x_dim_original) + '):  '))
 y_coord = int(input('+ Enter Y coordinate (' + str(0) + '-' + str(y_dim_original) + '):  '))
 z_coord = int(input('+ Enter Z coordinate (' + str(0) + '-' + str(z_dim_original) + '):  '))
@@ -59,6 +74,12 @@ vline3 = int(input('+ Selected horizontal line of 3rd view (' + str(0) + '-' + s
 cb_min = float(input('++ Minimum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
 cb_max = float(input('++ Maximum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
 
+# select the specific volume image
+if dim_check == 4:
+    img1_array = img1_array[:,:,:,vol]
+    img1 = nib.Nifti1Image(img1_array, np.eye(4))
+else:
+    print('You input 3D image !!')
 
 # upscaling based on minimum pixel resolution
 img1_up = resample_img(img1, target_affine=np.eye(3)*min_pixdim, interpolation='nearest')
