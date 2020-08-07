@@ -47,7 +47,7 @@ python ipPlot.py --help
 ![](assets/README-1a75415a.png)
 
 ## Version history
-+ Version 0.11 : The script release (2020.08.07)
++ Version 0.11 : Added 4D image option (2020.08.07)
 + Version 0.10 : The script release (2020.08.04)
 
 ## _Contact for Feedback and Bug Reports_
