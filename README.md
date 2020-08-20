@@ -41,7 +41,7 @@ python ipPlot.py --help
 
 ## Outputs
 + Intensity Profile (2D)
-![](assets/README-0ddc346a.png)
+![](assets/README-347a7e1d.png)
 
 + Intensity Profile (3D)
 ![](assets/README-758894fc.png)
