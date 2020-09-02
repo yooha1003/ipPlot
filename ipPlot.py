@@ -90,6 +90,7 @@ if dim_check == 2:
     print('You input 2D image !!')
     # x_coord = int(input('+ Enter X coordinate (' + str(0) + '-' + str(x_dim_original) + '):  '))
     # y_coord = int(input('+ Enter Y coordinate (' + str(0) + '-' + str(y_dim_original) + '):  '))
+    rot_val = str(input('++ Rotation xy plane:  '))
     vline3 = int(input('+ Selected horizontal line of 3rd view (' + str(0) + '-' + str(y_dim_original) + '):  '))
     cb_min = float(input('++ Minimum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
     cb_max = float(input('++ Maximum of an output scale (' + str(0) + '-' + str(max_val) + '):  '))
@@ -118,12 +119,18 @@ elif dim_check == 4:
 # select the specific volume image
 if dim_check == 2:
     print('You input 2D image !!')
-    # x,y,z ranges
-    x_dim = img1.shape[0]
-    y_dim = img1.shape[1]
-    max_dim = max(x_dim,y_dim)
-    min_dim = min(x_dim,y_dim)
-
+    if rot_val == 'yes':
+        img1_array = np.rot90(img1_array)
+        # x,y,z ranges
+        x_dim = img1.shape[0]
+        y_dim = img1.shape[1]
+        max_dim = max(x_dim,y_dim)
+        min_dim = min(x_dim,y_dim)
+    else:
+        x_dim = img1.shape[0]
+        y_dim = img1.shape[1]
+        max_dim = max(x_dim,y_dim)
+        min_dim = min(x_dim,y_dim)
     ## Main Run ##
     vline3_up = round(vline3 * (y_dim / y_dim_original))
 
